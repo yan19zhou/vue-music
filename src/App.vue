@@ -1,13 +1,17 @@
 <template>
   <div id="app">
-    1111
+    <m-header></m-header>
     <router-view/>
   </div>
 </template>
 
 <script>
+import MHeader from "components/m-header/m-header"
 export default {
-  name: 'App'
+  name: 'App',
+  components:{
+    MHeader
+  }
 }
 </script>
 
