@@ -1,26 +1,30 @@
 <template>
   <div id="app">
-    1111
+    <m-header></m-header>
+    <tab></tab>
     <router-view/>
   </div>
 </template>
 
 <script>
+import MHeader from "components/m-header/m-header"
+import Tab from "components/tab/tab"
 export default {
-  name: 'App'
+  name: 'App',
+  components:{
+    MHeader,
+    Tab,
+  }
 }
 </script>
 
 <style lang="stylus">
 
- @import "./common/stylus/index.styl"
+ @import "~common/stylus/variable.styl"
 
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  background :$color-background
+  height 100%
+  background $color-background
 }
 </style>
 
