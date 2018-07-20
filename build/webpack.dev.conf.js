@@ -9,9 +9,13 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const FriendlyErrorsPlugin = require('friendly-errors-webpack-plugin')
 const portfinder = require('portfinder')
+const express =require('express')
+const axios = require('axios')
 
 const HOST = process.env.HOST
 const PORT = process.env.PORT && Number(process.env.PORT)
+const app = express()
+const apiRoutes = express.Router()
 
 const devWebpackConfig = merge(baseWebpackConfig, {
   module: {
@@ -44,6 +48,11 @@ const devWebpackConfig = merge(baseWebpackConfig, {
       poll: config.dev.poll,
     }
   },
+
+  
+  
+
+  
   plugins: [
     new webpack.DefinePlugin({
       'process.env': require('../config/dev.env')
