@@ -4,9 +4,9 @@
         <div >
         <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">  
             <slider v-if="recommends">                
-                  <div v-for="item in recommends">
+                  <div v-for="item in recommends" >
                     <a :href="item.linkUrl">
-                    <img @load="imageLoad" :src="item.picUrl" alt="">
+                    <img class="needsclick" @load="imageLoad" :src="item.picUrl" alt="">
                     </a>
                   </div>              
             </slider>
@@ -16,7 +16,7 @@
           <ul>
             <li v-for="item in discList"  class="item" :unicode="item.dissid">
               <div class="icon">
-                <img :src="item.imgurl" alt="" width="80px" height="80px">
+                <img v-lazy="item.imgurl" alt="" width="80px" height="80px">
               </div>
               <div class="text">
                 <h2 class="name">{{item.creator.name}}</h2>
@@ -26,6 +26,9 @@
           </ul>
         </div>
         </div>
+        <div class="loading-container">
+          <loading v-show="!discList.length"></loading>  
+        </div>          
       </scroll>
   </div>
 </template>
@@ -33,6 +36,7 @@
 <script type="text/ecmascript-6">
   import Slider from 'base/slider/slider'
   import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
   import {getRecommend, getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
  
@@ -40,7 +44,8 @@
   export default {
     components:{
       Slider,
-      Scroll
+      Scroll,
+      Loading
     },
     data() {
       return {
@@ -49,8 +54,11 @@
       }
     },
     created() {
-      this._getRecommend()  
-      this._getDiscList()
+      this._getRecommend() 
+      setTimeout(() => {
+         this._getDiscList()
+      }, 2000); 
+     
     },
     methods: {
       _getRecommend() {
@@ -73,8 +81,7 @@
           this.$refs.scroll.refresh()
           this.checkLoad = true
         }
-      }
-      
+      }    
     }   
   }
 </script>
