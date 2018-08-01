@@ -7,22 +7,23 @@
     </div>
 </template>
 <script>
-    
-
 </script>
 <style lang="stylus" scoped>
-@import "~common/stylus/variable.styl"
-.tab{
-    display flex
-    justify-content center
+@import '~common/stylus/variable.styl';
+
+.tab {
+    display: flex;
+    justify-content: center;
 }
-.tab div{
-    margin 10px
-    width 60px
-    text-align center
+
+.tab div {
+    margin: 10px;
+    width: 60px;
+    text-align: center;
 }
-.active{
-    color $color-theme
-    border-bottom 3px solid $color-theme
+
+.active {
+    color: $color-theme;
+    border-bottom: 3px solid $color-theme;
 }
 </style>

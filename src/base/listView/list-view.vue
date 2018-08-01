@@ -1,5 +1,9 @@
 <template>
-    <scroll ref="listview" class="listview" :data="data">
+    <scroll ref="listview" class="listview" 
+    :data="data"
+    :listenScroll="listenScroll"
+    @scroll="scroll"
+    >
         <ul>
             <li v-for="group in data" class="list-group" ref="listGroup">
                 <h2 class="list-group-title">{{group.title}}</h2>
@@ -38,8 +42,14 @@ export default {
   },
   data() {
     return {
-      currentIndex: 0
+      currentIndex: 0,
+      scrollY:-1
     };
+  },
+  created() {
+    this.touch = {};
+    this.listenScroll = true
+    this.listHeight=[]
   },
   computed: {
     shortcutList() {
@@ -56,19 +66,47 @@ export default {
       this.touch.anchorIndex = anchorIndex;
       this._scrollTo(anchorIndex);
     },
-    _scrollTo(index) {
-      this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0); //使用scroll的scrollToElement方法跳到对应元素的位置
-    },
     onShortcutTouchMove(e) {
       this.touch.y2 = e.touches[0].pageY; // 触屏点现在的垂直位置
       let count = Math.round((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT); // 得出位移数
       let anchorIndex = count + parseInt(this.touch.anchorIndex); // 使用parseInt把字符串转换成数字
       this._scrollTo(anchorIndex);
+    },
+    scroll(pos){
+        this.scrollY=pos.y
+    },
+     _scrollTo(index) {
+      this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0); //使用scroll的scrollToElement方法跳到对应元素的位置
+    },
+    _calculateHeight(){
+        this.listHeight = []
+        const list = this.$refs.listGroup
+        let height = 0
+        this.listHeight.push(height)
+        for(let i=0;i<list.length;i++){
+            height+=list[i].clientHeight
+            this.listHeight.push(height)
+        }
     }
   },
-  created() {
-    this.touch = {};
-    //console.log(this.data)
+  watch:{
+      data(){
+          setTimeout(() => {
+              this._calculateHeight()
+          }, 20);
+      },
+      scrollY(newY){
+          let listHeight = this.listHeight;
+          for (let i = 0; i < listHeight.length; i++) {
+              let height1 = listHeight[i];
+              let height2 = listHeight[i+1];
+              if (!height2 || (-newY>height1&&-newY<height2)) {
+                  this.currentIndex = i
+                  return
+              }
+          }
+          this.currentIndex = 0 
+      }
   }
 };
 </script>
