@@ -1,5 +1,9 @@
 <template>
-    <scroll ref="listview" class="listview" :data="data">
+    <scroll ref="listview" class="listview" 
+    :data="data"
+    :listenScroll="listenScroll"
+    @scroll="scroll"
+    >
         <ul>
             <li v-for="group in data" class="list-group" ref="listGroup">
                 <h2 class="list-group-title">{{group.title}}</h2>
@@ -22,32 +26,76 @@
 </template>
 
 <script type="text/ecmascript-6">
- import Scroll from 'base/scroll/scroll'
- import { getData } from 'common/js/dom'
-  const TITLE_HEIGHT = 30
-  const ANCHOR_HEIGHT = 18
-  export default{
-      components:{
-          Scroll
-      },
-      props:{
-          data:{
-              type:Array,
-              default:null
-          }
-      },
+import Scroll from "base/scroll/scroll";
+import { getData } from "common/js/dom";
+const TITLE_HEIGHT = 30;
+const ANCHOR_HEIGHT = 18;
+export default {
+  components: {
+    Scroll
+  },
+  props: {
+    data: {
+      type: Array,
+      default: null
+    }
+  },
+  data() {
+    return {
+      currentIndex: 0,
+      scrollY:-1
+    };
+  },
+  created() {
+    this.touch = {};
+    this.listenScroll = true
+    this.listHeight=[]
+  },
+  computed: {
+    shortcutList() {
+      return this.data.map(group => {
+        return group.title.substr(0, 1);
+      });
+    }
+  },
+  methods: {
+    onShortcutTouchStart(e) {
+      let anchorIndex = getData(e.target, "index"); // 使用dom.js中的方法获取自定义属性
+      let firstTouch = e.touches[0];
+      this.touch.y1 = firstTouch.pageY;
+      this.touch.anchorIndex = anchorIndex;
+      this._scrollTo(anchorIndex);
+    },
+    onShortcutTouchMove(e) {
+      this.touch.y2 = e.touches[0].pageY; // 触屏点现在的垂直位置
+      let count = Math.round((this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT); // 得出位移数
+      let anchorIndex = count + parseInt(this.touch.anchorIndex); // 使用parseInt把字符串转换成数字
+      this._scrollTo(anchorIndex);
+    },
+    scroll(pos){
+        this.scrollY=pos.y
+    },
+     _scrollTo(index) {
+      this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0); //使用scroll的scrollToElement方法跳到对应元素的位置
+    },
+    _calculateHeight(){
+        this.listHeight = []
+        const list = this.$refs.listGroup
+        let height = 0
+        this.listHeight.push(height)
+        for(let i=0;i<list.length;i++){
+            height+=list[i].clientHeight
+            this.listHeight.push(height)
+        }
+    }
+  },
+  watch:{
       data(){
-          return {
-              currentIndex:0
-          }
+          setTimeout(() => {
+              this._calculateHeight()
+          }, 20);
       },
-      computed:{
-          shortcutList() {
-            return this.data.map((group) => {
-            return group.title.substr(0, 1)
-            })
-        }         
-      },
+<<<<<<< HEAD
       methods:{
           onShortcutTouchStart(e){
               
@@ -67,80 +115,111 @@
             let anchorIndex = count+parseInt(this.touch.anchorIndex)
             console.log(anchorIndex)
             this._scrollTo(anchorIndex)
+=======
+      scrollY(newY){
+          let listHeight = this.listHeight;
+          for (let i = 0; i < listHeight.length; i++) {
+              let height1 = listHeight[i];
+              let height2 = listHeight[i+1];
+              if (!height2 || (-newY>height1&&-newY<height2)) {
+                  this.currentIndex = i
+                  return
+              }
+>>>>>>> cafd68c8caebb4b06330fb4a91123f1d1378816d
           }
-      },
-      created(){
-          this.touch = {}
-          //console.log(this.data)
+          this.currentIndex = 0 
       }
-      
   }
+};
 </script>
 
 <style scoped lang="stylus" rel="stylesheet/stylus">
-  @import "~common/stylus/variable"
+@import '~common/stylus/variable';
 
-  .listview
-    position: relative
-    width: 100%
-    height: 100%
-    overflow: hidden
-    background: $color-background
-    .list-group
-      padding-bottom: 30px
-      .list-group-title
-        height: 30px
-        line-height: 30px
-        padding-left: 20px
-        font-size: $font-size-small
-        color: $color-text-l
-        background: $color-highlight-background
-      .list-group-item
-        display: flex
-        align-items: center
-        padding: 20px 0 0 30px
-        .avatar
-          width: 50px
-          height: 50px
-          border-radius: 50%
-        .name
-          margin-left: 20px
-          color: $color-text-l
-          font-size: $font-size-medium
-    .list-shortcut
-      position: absolute
-      z-index: 30
-      right: 0
-      top: 50%
-      transform: translateY(-50%)
-      width: 20px
-      padding: 20px 0
-      border-radius: 10px
-      text-align: center
-      background: $color-background-d
-      font-family: Helvetica
-      .item
-        padding: 3px
-        line-height: 1
-        color: $color-text-l
-        font-size: $font-size-small
-        &.current
-          color: $color-theme
-    .list-fixed
-      position: absolute
-      top: 0
-      left: 0
-      width: 100%
-      .fixed-title
-        height: 30px
-        line-height: 30px
-        padding-left: 20px
-        font-size: $font-size-small
-        color: $color-text-l
-        background: $color-highlight-background
-    .loading-container
-      position: absolute
-      width: 100%
-      top: 50%
-      transform: translateY(-50%)
+.listview {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: $color-background;
+
+    .list-group {
+        padding-bottom: 30px;
+
+        .list-group-title {
+            height: 30px;
+            line-height: 30px;
+            padding-left: 20px;
+            font-size: $font-size-small;
+            color: $color-text-l;
+            background: $color-highlight-background;
+        }
+
+        .list-group-item {
+            display: flex;
+            align-items: center;
+            padding: 20px 0 0 30px;
+
+            .avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+            }
+
+            .name {
+                margin-left: 20px;
+                color: $color-text-l;
+                font-size: $font-size-medium;
+            }
+        }
+    }
+
+    .list-shortcut {
+        position: absolute;
+        z-index: 30;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        padding: 20px 0;
+        border-radius: 10px;
+        text-align: center;
+        background: $color-background-d;
+        font-family: Helvetica;
+
+        .item {
+            padding: 3px;
+            line-height: 1;
+            color: $color-text-l;
+            font-size: $font-size-small;
+
+            &.current {
+                color: $color-theme;
+            }
+        }
+    }
+
+    .list-fixed {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+
+        .fixed-title {
+            height: 30px;
+            line-height: 30px;
+            padding-left: 20px;
+            font-size: $font-size-small;
+            color: $color-text-l;
+            background: $color-highlight-background;
+        }
+    }
+
+    .loading-container {
+        position: absolute;
+        width: 100%;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
 </style>

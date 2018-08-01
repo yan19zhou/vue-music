@@ -4,8 +4,7 @@
     <tab></tab>
     <keep-alive>
     <router-view/>
-    </keep-alive>
-    
+    </keep-alive>   
   </div>
 </template>
 
