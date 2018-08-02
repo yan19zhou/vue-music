@@ -3,6 +3,7 @@
     :data="data"
     :listenScroll="listenScroll"
     @scroll="scroll"
+    :probeType="probeType"
     >
         <ul>
             <li v-for="group in data" class="list-group" ref="listGroup">
@@ -50,6 +51,7 @@ export default {
     this.touch = {};
     this.listenScroll = true
     this.listHeight=[]
+    this.probeType = 3
   },
   computed: {
     shortcutList() {
@@ -95,39 +97,25 @@ export default {
               this._calculateHeight()
           }, 20);
       },
-<<<<<<< HEAD
-      methods:{
-          onShortcutTouchStart(e){
-              
-                let anchorIndex = getData(e.target, 'index')               
-                let firstTouch = e.touches[0]
-                this.touch.y1 = firstTouch.pageY
-                this.touch.anchorIndex = anchorIndex
-                this._scrollTo(anchorIndex)
-          },
-          _scrollTo(index){
-           
-              this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
-          },
-          onShortcutTouchMove(e){
-            this.touch.y2 = e.touches[0].pageY
-            let count = Math.round((this.touch.y2-this.touch.y1)/ANCHOR_HEIGHT)
-            let anchorIndex = count+parseInt(this.touch.anchorIndex)
-            console.log(anchorIndex)
-            this._scrollTo(anchorIndex)
-=======
       scrollY(newY){
           let listHeight = this.listHeight;
-          for (let i = 0; i < listHeight.length; i++) {
+          // 当滚动到顶部
+          if (newY>0) {
+              this.currentIndex = 0
+              return
+          }
+          // 在中间滚动
+          for (let i = 0; i < listHeight.length-1; i++) {
               let height1 = listHeight[i];
               let height2 = listHeight[i+1];
-              if (!height2 || (-newY>height1&&-newY<height2)) {
+              if (-newY>=height1&&-newY<height2) {
                   this.currentIndex = i
                   return
               }
->>>>>>> cafd68c8caebb4b06330fb4a91123f1d1378816d
           }
-          this.currentIndex = 0 
+          // 滚动到底部
+          this.currentIndex =  listHeight.length-2
+          console.log(this.currentIndex)
       }
   }
 };
