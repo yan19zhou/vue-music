@@ -58,15 +58,9 @@ export default {
   },
   created() {
     this.touch = {};
-<<<<<<< HEAD
-    this.listenScroll = true
-    this.listHeight=[]
-    this.probeType = 3
-=======
     this.listenScroll = true;
     this.listHeight = [];
     this.probeType = 3;
->>>>>>> 7651ac1d5f82a6e0be3009abc76b757c0e05f0a2
   },
   computed: {
     shortcutList() {
@@ -123,33 +117,6 @@ export default {
       }
     }
   },
-<<<<<<< HEAD
-  watch:{
-      data(){
-          setTimeout(() => {
-              this._calculateHeight()
-          }, 20);
-      },
-      scrollY(newY){
-          let listHeight = this.listHeight;
-          // 当滚动到顶部
-          if (newY>0) {
-              this.currentIndex = 0
-              return
-          }
-          // 在中间滚动
-          for (let i = 0; i < listHeight.length-1; i++) {
-              let height1 = listHeight[i];
-              let height2 = listHeight[i+1];
-              if (-newY>=height1&&-newY<height2) {
-                  this.currentIndex = i
-                  return
-              }
-          }
-          // 滚动到底部
-          this.currentIndex =  listHeight.length-2
-          console.log(this.currentIndex)
-=======
   watch: {
     data() {
       setTimeout(() => {
@@ -172,7 +139,6 @@ export default {
           this.diff = height2 + newY
           return;
         }
->>>>>>> 7651ac1d5f82a6e0be3009abc76b757c0e05f0a2
       }
       // 页面滚动到底部
       this.currentIndex = listHeight.length - 2;
