@@ -3,6 +3,7 @@
     :data="data"
     :listenScroll="listenScroll"
     @scroll="scroll"
+
     >
         <ul>
             <li v-for="group in data" class="list-group" ref="listGroup">
