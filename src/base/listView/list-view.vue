@@ -6,10 +6,10 @@
     :probeType="probeType"
     >
         <ul>
-            <li v-for="group in data" class="list-group" ref="listGroup">
+            <li  v-for="group in data" class="list-group" ref="listGroup">
                 <h2 class="list-group-title">{{group.title}}</h2>
                 <ul>
-                    <li v-for="item in group.item" class="list-group-item">
+                    <li @click="selectItem(item)" v-for="item in group.item" class="list-group-item">
                         <img v-lazy="item.avator" alt="" class="avatar">
                         <span class="name">{{item.name}}</span>
                     </li>
@@ -75,6 +75,9 @@ export default {
     }
   },
   methods: {
+    selectItem(item){
+      this.$emit('select',item)
+    },
     onShortcutTouchStart(e) {
       let anchorIndex = getData(e.target, "index"); // 使用dom.js中的方法获取自定义属性
       let firstTouch = e.touches[0];
