@@ -6,10 +6,10 @@
     :probeType="probeType"
     >
         <ul>
-            <li v-for="group in data" class="list-group" ref="listGroup">
+            <li  v-for="group in data" class="list-group" ref="listGroup">
                 <h2 class="list-group-title">{{group.title}}</h2>
                 <ul>
-                    <li v-for="item in group.item" class="list-group-item">
+                    <li @click="selectItem(item)" v-for="item in group.item" class="list-group-item">
                         <img v-lazy="item.avator" alt="" class="avatar">
                         <span class="name">{{item.name}}</span>
                     </li>
@@ -23,17 +23,25 @@
             </li>
         </ul>
     </div>
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+        <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
+    <div v-show="!data.length" class="loading-container">
+        <loading></loading>
+    </div>
     </scroll>
 </template>
 
 <script type="text/ecmascript-6">
 import Scroll from "base/scroll/scroll";
 import { getData } from "common/js/dom";
+import Loading from "base/loading/loading"
 const TITLE_HEIGHT = 30;
 const ANCHOR_HEIGHT = 18;
 export default {
   components: {
-    Scroll
+    Scroll,
+    Loading
   },
   props: {
     data: {
@@ -44,23 +52,38 @@ export default {
   data() {
     return {
       currentIndex: 0,
-      scrollY:-1
+      scrollY: -1,
+      diff:0
     };
   },
   created() {
     this.touch = {};
+<<<<<<< HEAD
     this.listenScroll = true
     this.listHeight=[]
     this.probeType = 3
+=======
+    this.listenScroll = true;
+    this.listHeight = [];
+    this.probeType = 3;
+>>>>>>> 7651ac1d5f82a6e0be3009abc76b757c0e05f0a2
   },
   computed: {
     shortcutList() {
       return this.data.map(group => {
         return group.title.substr(0, 1);
       });
+    },
+    fixedTitle() {
+      return this.data[this.currentIndex]
+        ? this.data[this.currentIndex].title
+        : null;
     }
   },
   methods: {
+    selectItem(item){
+      this.$emit('select',item)
+    },
     onShortcutTouchStart(e) {
       let anchorIndex = getData(e.target, "index"); // 使用dom.js中的方法获取自定义属性
       let firstTouch = e.touches[0];
@@ -74,23 +97,33 @@ export default {
       let anchorIndex = count + parseInt(this.touch.anchorIndex); // 使用parseInt把字符串转换成数字
       this._scrollTo(anchorIndex);
     },
-    scroll(pos){
-        this.scrollY=pos.y
+    scroll(pos) {
+      this.scrollY = pos.y;
     },
-     _scrollTo(index) {
+    _scrollTo(index) {
+      if (!index && index !== 0) {
+        return;
+      }
+      if (index < 0) {
+        index = 0;
+      } else if (index > this.listHeight.length - 2) {
+        index = this.listHeight.length - 2;
+      }
+      this.scrollY = -this.listHeight[index];
       this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0); //使用scroll的scrollToElement方法跳到对应元素的位置
     },
-    _calculateHeight(){
-        this.listHeight = []
-        const list = this.$refs.listGroup
-        let height = 0
-        this.listHeight.push(height)
-        for(let i=0;i<list.length;i++){
-            height+=list[i].clientHeight
-            this.listHeight.push(height)
-        }
+    _calculateHeight() {
+      this.listHeight = [];
+      const list = this.$refs.listGroup;
+      let height = 0;
+      this.listHeight.push(height);
+      for (let i = 0; i < list.length; i++) {
+        height += list[i].clientHeight;
+        this.listHeight.push(height);
+      }
     }
   },
+<<<<<<< HEAD
   watch:{
       data(){
           setTimeout(() => {
@@ -116,7 +149,42 @@ export default {
           // 滚动到底部
           this.currentIndex =  listHeight.length-2
           console.log(this.currentIndex)
+=======
+  watch: {
+    data() {
+      setTimeout(() => {
+        this._calculateHeight();
+      }, 20);
+    },
+    scrollY(newY) {
+      let listHeight = this.listHeight;
+      // 当页面滚动到顶部
+      if (newY > 0) {
+        this.currentIndex = 0;
+        return;
       }
+      // 当页面在中部滚动
+      for (let i = 0; i < listHeight.length - 1; i++) {
+        let height1 = listHeight[i];
+        let height2 = listHeight[i + 1];
+        if (-newY >= height1 && -newY < height2) {
+          this.currentIndex = i;
+          this.diff = height2 + newY
+          return;
+        }
+>>>>>>> 7651ac1d5f82a6e0be3009abc76b757c0e05f0a2
+      }
+      // 页面滚动到底部
+      this.currentIndex = listHeight.length - 2;
+    },
+    diff(newVal){
+      let fixedTop = (newVal>0 && newVal<TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0  
+      if (fixedTop == this.fixedTop) {
+          return 
+      }
+      this.fixedTop = fixedTop
+      this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
+    }
   }
 };
 </script>

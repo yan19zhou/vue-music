@@ -1,6 +1,7 @@
 <template>
     <div class="singer">
-       <list-view :data="singers" v-show="singers.length"></list-view> 
+       <list-view :data="singers" v-show="singers.length" @select="selectSinger"></list-view> 
+       <router-view></router-view>
     </div>
 </template>
 <script>
@@ -20,12 +21,16 @@
             this._getSingerList()
         },
         methods:{
+            selectSinger(singer){
+                this.$router.push({
+                    path:`/singer/${singer.id}`
+                })
+            },
             _getSingerList(){
                 getSingerList().then((res)=>{
-                    if (res.code === ERR_OK) {  
-                                        
-                        this.singers = this._normalizeSinger(res.data.list)  
-                          console.log( this.singers )                  
+                    if (res.code === ERR_OK) {                    
+                          this.singers = this._normalizeSinger(res.data.list)  
+                          console.log( this.singers )                                                          
                     }
                 })
             },
