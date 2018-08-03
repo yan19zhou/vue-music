@@ -21,12 +21,12 @@ export default new Router({
       {
         path:'/rank',
         component: Rank
-    },
-    {
+     },
+     {
         path:'/search',
         component: Search
-    },
-    {
+     },
+     {
         path:'/singer',
         component: Singer,
         children:[
@@ -35,7 +35,7 @@ export default new Router({
                 component:SingerDetail
             }
         ]
-    }
+     }
   ],
   linkActiveClass:'active'
 })
