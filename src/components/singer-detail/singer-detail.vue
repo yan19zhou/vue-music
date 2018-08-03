@@ -1,8 +1,7 @@
 <template>
     <transition name="slide">
         <div class="singer-detail"></div>
-    </transition>
-    
+    </transition>    
 </template>
 <script>
 export default {
