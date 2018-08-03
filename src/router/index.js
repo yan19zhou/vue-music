@@ -6,7 +6,6 @@ import Search from 'components/search/search'
 import Singer from 'components/singer/singer'
 import SingerDetail from 'components/singer-detail/singer-detail'
 
-
 Vue.use(Router)
 
 export default new Router({

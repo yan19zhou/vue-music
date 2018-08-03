@@ -85,11 +85,12 @@
         },
         components:{
             ListView,
-        }
-    }
-</script>
-<style lang="stylus" scoped>
-.singer
+.singer {
+    position: fixed;
+    top: 88px;
+    bottom: 0;
+    width: 100%;
+}
     position: fixed
     top: 88px
     bottom: 0
