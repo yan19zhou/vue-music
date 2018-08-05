@@ -6,7 +6,6 @@ import Search from 'components/search/search'
 import Singer from 'components/singer/singer'
 import SingerDetail from 'components/singer-detail/singer-detail'
 
-
 Vue.use(Router)
 
 export default new Router({
@@ -22,12 +21,12 @@ export default new Router({
       {
         path:'/rank',
         component: Rank
-    },
-    {
+     },
+     {
         path:'/search',
         component: Search
-    },
-    {
+     },
+     {
         path:'/singer',
         component: Singer,
         children:[
@@ -36,7 +35,7 @@ export default new Router({
                 component:SingerDetail
             }
         ]
-    }
+     }
   ],
   linkActiveClass:'active'
 })

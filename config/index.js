@@ -21,6 +21,7 @@ module.exports = {
           '^/api/getDiscList':''
         }
       }
+      
     },
 
     // Various Dev Server settings
