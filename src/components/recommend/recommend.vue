@@ -2,7 +2,7 @@
   <div class="recommend" ref="recommend">
       <scroll ref="scroll" class="recommend-content" :data="discList">
         <div >
-        <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">  
+        <div  class="slider-wrapper" ref="sliderWrapper">  
             <slider v-if="recommends.length">                
                   <div v-for="item in recommends" >
                     <a :href="item.linkUrl">
