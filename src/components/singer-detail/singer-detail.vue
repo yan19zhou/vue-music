@@ -1,17 +1,31 @@
 <template>
-    <transition name="slide">
-        <div class="singer-detail"></div>
+    <transition name="slide">      
+        <music-list :songs="songs" :title="title" :bg-image="bgImage">
+        </music-list>         
     </transition>    
 </template>
 <script>
 import {mapGetters} from 'vuex'
 import {getSingerDetailList} from 'api/singer'
 import {ERR_OK} from 'api/config'
+import {createSong, getSongVkey} from 'common/js/song'
+import musicList from 'components/music-list/music-list'
 export default {
+    data() {
+        return {
+        songs: []
+        }
+    },
     computed:{
+        title(){
+         return this.singer.name
+        },
+        bgImage(){
+        return this.singer.avator
+        },
          ...mapGetters([
         'singer'
-      ])
+      ])    
     },
     created(){
         //console.log(this.singer.id)
@@ -27,24 +41,38 @@ export default {
             }
           getSingerDetailList(this.singer.id).then((res)=>{
               if(res.code==ERR_OK){
-                  console.log(res.data.list)
+                let list = res.data.list               
+                this.songs = this._normalizeSongs(list)
+                console.log(this.songs)
               }
           }) 
+        },
+        _normalizeSongs(list){          
+            let ret = []
+            list.forEach(e => {
+               let musicData = e.musicData 
+               if (musicData.songmid && musicData.albummid) {
+                getSongVkey(musicData.songmid).then((res)=>{
+                    if (res.code == ERR_OK) {
+                        let vkey = res.data.items[0].vkey
+                         ret.push(createSong(musicData,vkey)) 
+                    }
+                })
+                 
+               }
+            });
+            return ret           
         }
+    },
+    components:{
+        musicList
     }
 }
 </script>
 <style lang="stylus" scoped>
 @import "~common/stylus/variable"
 
-.singer-detail
-    position fixed
-    top 0
-    bottom 0
-    left 0
-    right 0
-    z-index 100
-    background-color $color-background
+
 .slide-enter-active, .slide-leave-active
     transition all .3s 
 .slide-enter,.slide-leave-top 
