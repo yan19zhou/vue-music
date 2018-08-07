@@ -7,7 +7,8 @@
     <div class="bg-image" :style="bgStyle" ref="bgImage" >
        <div class="filter"></div>
     </div>
-    <scroll :data="songs" class="list" ref="list">
+    <div class="bg-layer" ref="layer"></div>
+    <scroll @scroll="scroll" :probe-type="probeType" :listen-scroll="listenScroll" :data="songs" class="list" ref="list">
       <div class="song-list-wrapper">
           <song-list :songs="songs">
           </song-list>
@@ -18,6 +19,9 @@
 <script>
 import songList from 'base/song-list/song-list'
 import scroll from 'base/scroll/scroll'
+import {prefixStyle} from 'common/js/dom'
+const SCROLL_HEIGHT = 40
+const transform = prefixStyle('transform')
 export default {
     props:{
       songs:{
@@ -33,17 +37,56 @@ export default {
         default:''
       }
     },
+    data(){
+      return {
+        scrollY:0
+      }
+    },
+    created(){
+      this.probeType = 3;
+      this.listenScroll = true
+
+    },
     computed:{
       bgStyle(){
         return `background-image:url(${this.bgImage})`
       }
     },
     mounted(){
-      this.$refs.list.$el.style.top = this.$refs.bgImage.clientHeight+'px'
+      this.bgImageHeight = this.$refs.bgImage.clientHeight
+      this.minHeight = -this.bgImageHeight+SCROLL_HEIGHT
+      this.$refs.list.$el.style.top = this.bgImageHeight+'px'
     },  
     methods:{
       back(){
-
+        this.$router.back()
+      },
+      scroll(pos){
+        this.scrollY = pos.y
+      }
+    },
+    watch:{
+      scrollY(newY){
+        let zIndex =0
+        let translateY = Math.max( this.minHeight, newY)
+        let scale = 1
+        
+          this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
+          let percent = Math.abs(newY/this.minHeight)
+          if (newY>0) {
+            scale = scale+percent
+            zIndex=2
+          }
+         if (newY < this.minHeight) {
+           this.$refs.bgImage.style.paddingTop=0;
+           this.$refs.bgImage.style.height = `${SCROLL_HEIGHT}px`
+           zIndex = 2
+         }else{
+           this.$refs.bgImage.style.paddingTop='70%';
+           this.$refs.bgImage.style.height = 0
+         }
+        this.$refs.bgImage.style['zIndex']=zIndex
+        this.$refs.bgImage.style[transform] = `scale(${scale})`
       }
     },
     components:{
@@ -90,7 +133,6 @@ export default {
       width: 100%
       height: 0
       padding-top: 70%
-      z-index 2
       transform-origin: top
       background-size: cover
       background-repeat no-repeat 
