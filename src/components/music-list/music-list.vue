@@ -12,7 +12,8 @@
       <div class="song-list-wrapper">
           <song-list :songs="songs">
           </song-list>
-      </div>          
+      </div>    
+      <div class="loading-container" v-show="!songs.length"></div>      
     </scroll>
   </div> 
 </template>
@@ -70,7 +71,7 @@ export default {
         let zIndex =0
         let translateY = Math.max( this.minHeight, newY)
         let scale = 1
-        
+       
           this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
           let percent = Math.abs(newY/this.minHeight)
           if (newY>0) {
