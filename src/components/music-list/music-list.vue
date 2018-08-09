@@ -5,6 +5,12 @@
     </div>
     <h1 class="title" v-html="title"></h1>
     <div class="bg-image" :style="bgStyle" ref="bgImage" >
+       <div class="play-wrapper">
+        <div ref="playBtn" v-show="songs.length>0" class="play" @click="random">
+          <i class="icon-play"></i>
+          <span class="text">随机播放全部</span>
+        </div>
+      </div>
        <div class="filter"></div>
     </div>
     <div class="bg-layer" ref="layer"></div>
@@ -21,6 +27,7 @@
 import songList from 'base/song-list/song-list'
 import scroll from 'base/scroll/scroll'
 import {prefixStyle} from 'common/js/dom'
+import {mapActions} from 'vuex'
 const SCROLL_HEIGHT = 40
 const transform = prefixStyle('transform')
 export default {
@@ -65,8 +72,17 @@ export default {
       scroll(pos){
         this.scrollY = pos.y
       },
-      selectItem(song,index){
-
+      selectItem(song,index){ 
+        this.selectPlay({
+          list:this.songs,
+          index:index
+        })
+      },
+      ...mapActions([
+        'selectPlay'
+      ]),
+      random(){
+        
       }
     },
     watch:{
