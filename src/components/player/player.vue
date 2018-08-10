@@ -1,45 +1,54 @@
 <template>
     <div class="player" v-show="playList.length>0">        
-    <transition name="normal" >
+        <transition name="normal" 
+          @enter="enter"
+          @after-enter="afterEnter"
+          @leave="leave"
+          @after-leave="afterLeave"
+        >
       <div class="normal-player" v-show="fullScreen">
         <div class="background">
-          <img width="100%" height="100%" >
+          <img width="100%" height="100%" :src="currentSong.image">
         </div>
         <div class="top">
-          <div class="back" >
+          <div class="back" @click="back">
             <i class="icon-back"></i>
           </div>
-          <h1 class="title" ></h1>
-          <h2 class="subtitle" ></h2>
+          <h1 class="title" v-html="currentSong.name"></h1>
+          <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
         <div class="middle">
           <div class="middle-l" >
-            <div class="cd-wrapper" >
+            <div class="cd-wrapper">
               <div class="cd" >
-                <img class="image" >
+                <img class="image" :src="currentSong.image" >
               </div>
             </div>
             <div class="playing-lyric-wrapper">
               <div class="playing-lyric"></div>
             </div>
           </div>
-          <scroll class="middle-r">
+          <scroll class="middle-r" >
             <div class="lyric-wrapper">
-              <div>
+              <div >
+                <p ref="lyricLine"
+                   class="text">
+                   </p>
               </div>
             </div>
           </scroll>
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
-          
+            <span class="dot" ></span>
+            <span class="dot" ></span>
           </div>
           <div class="progress-wrapper">
             <span class="time time-l"></span>
             <div class="progress-bar-wrapper">
-             
+              <!-- <progress-bar ></progress-bar> -->
             </div>
-           
+            <span class="time time-r"></span>
           </div>
           <div class="operators">
             <div class="icon i-left" >
@@ -49,31 +58,102 @@
               <i  class="icon-prev"></i>
             </div>
             <div class="icon i-center" >
-              <i ></i>
+              <i  ></i>
             </div>
             <div class="icon i-right" >
-              <i class="icon-next"></i>
+              <i  class="icon-next"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon" ></i>
+              <i class="icon"></i>
             </div>
           </div>
         </div>
       </div>
     </transition>
-        <div class="mili-player" v-show="!fullScreen">
-
+      <transition name="mini">
+      <div class="mini-player" v-show="!fullScreen" @click="open">
+        <div class="icon">
+          <img  width="40" height="40" :src="currentSong.image">
         </div>
+        <div class="text">
+          <h2 class="name" v-html="currentSong.name" ></h2>
+          <p class="desc" v-html="currentSong.singer"></p>
+        </div>
+        <div class="control">
+          <!-- <progress-circle >
+            <i  class="icon-mini" ></i>
+          </progress-circle> -->
+        </div>
+        <div class="control" @click.stop="showPlaylist">
+          <i class="icon-playlist"></i>
+        </div>
+      </div>
+    </transition>
     </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
+import Scroll from 'base/scroll/scroll'
+import {mapMutations} from 'vuex'
+import animations from 'create-keyframe-animation'
 export default {
   computed: {
-    ...mapGetters(["fullScreen", "playList", "currentIndex"])
+    ...mapGetters(["fullScreen", "playList", "currentSong"])
   },
   created() {
-    console.log(this.currentIndex);
+    
+  },
+  methods:{
+    back(){
+      this.setFullScreen(false)
+    },
+    open(){
+      this.setFullScreen(true)
+    },
+  ...mapMutations({
+      setFullScreen:'SET_FULLSCREEN'
+    }),
+    enter(){
+      const {x,y,scale} = this._getPosAndScale()
+      let animation = {
+        0:{
+          transform:`translate3d(${x}px,${y}px,0) scale(${scale})`
+        },
+        60:{
+          transform:`translate3d(0,0,0) scale(1.1)`
+        },
+        100:{
+          transform:`translate3d(0,0,0) scale(1)`
+        }
+      }
+    },
+    afterEnter(){
+
+    },
+    leave(){
+
+    },
+    afterLeave(){
+
+    },
+    _getPosAndScale(){
+        const targetWidth = 40
+        const paddingLeft = 40
+        const paddingBottom = 30
+        const paddingTop = 80
+        const width = window.innerWidth*0.8
+        const scale = targetWidth/width
+        const x = -(window.innerWidth/2-paddingLeft)
+        const y =window.innerHeight-paddingTop-width/2-paddingBottom
+        return {
+          x,
+          y,
+          scale
+        }
+    }
+  },
+  components:{
+    Scroll
   }
 };
 </script>
