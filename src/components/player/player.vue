@@ -19,9 +19,9 @@
         </div>
         <div class="middle">
           <div class="middle-l" >
-            <div class="cd-wrapper">
-              <div class="cd" >
-                <img class="image" :src="currentSong.image" >
+            <div class="cd-wrapper" ref="cdWrapper">
+              <div class="cd" :class="cdCls">
+                <img  class="image"  :src="currentSong.image" >
               </div>
             </div>
             <div class="playing-lyric-wrapper">
@@ -44,27 +44,27 @@
             <span class="dot" ></span>
           </div>
           <div class="progress-wrapper">
-            <span class="time time-l"></span>
+            <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <!-- <progress-bar ></progress-bar> -->
+              <progress-bar :precent="precent" @precentChange="precentChange"></progress-bar>
             </div>
-            <span class="time time-r"></span>
+            <span class="time time-r">{{format(currentSong.duration)}}</span>
           </div>
           <div class="operators">
             <div class="icon i-left" >
-              <i ></i>
+              <i class="icon-sequence"></i>
             </div>
-            <div class="icon i-left" >
-              <i  class="icon-prev"></i>
+            <div class="icon i-left" :class="playVisiable">
+              <i @click="prev" class="icon-prev" ></i>
             </div>
             <div class="icon i-center" >
-              <i  ></i>
+              <i @click="togglePlaying"  :class="playIcon"></i>
             </div>
-            <div class="icon i-right" >
-              <i  class="icon-next"></i>
+            <div class="icon i-right" :class="playVisiable" >
+              <i @click="next" class="icon-next"></i>
             </div>
             <div class="icon i-right">
-              <i class="icon"></i>
+              <i class="icon-not-favorite"></i>
             </div>
           </div>
         </div>
@@ -73,13 +73,14 @@
       <transition name="mini">
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
-          <img  width="40" height="40" :src="currentSong.image">
+          <img  :class="cdCls" width="40" height="40" :src="currentSong.image">
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name" ></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
+          <i @click.stop="togglePlaying" :class="miniIcon"></i>
           <!-- <progress-circle >
             <i  class="icon-mini" ></i>
           </progress-circle> -->
@@ -89,71 +90,206 @@
         </div>
       </div>
     </transition>
+    <audio ref="audio" :src="currentSong.url" 
+      @canplay="ready" 
+      @error="error" 
+      @timeupdate="updateTime" 
+      @ended="ended"></audio>
     </div>
 </template>
 <script>
 import { mapGetters } from "vuex";
-import Scroll from 'base/scroll/scroll'
-import {mapMutations} from 'vuex'
-import animations from 'create-keyframe-animation'
+import Scroll from "base/scroll/scroll";
+import ProgressBar from "base/progress-bar/progress-bar";
+import { mapMutations } from "vuex";
+import animations from "create-keyframe-animation";
+import { prefixStyle } from "common/js/dom";
+const transform = prefixStyle("animation");
 export default {
+  data() {
+    return {
+      songReady: false,
+      currentTime: 0
+    };
+  },
   computed: {
-    ...mapGetters(["fullScreen", "playList", "currentSong"])
-  },
-  created() {
-    
-  },
-  methods:{
-    back(){
-      this.setFullScreen(false)
+    precent() {
+      return this.currentTime / this.currentSong.duration;
     },
-    open(){
-      this.setFullScreen(true)
+    playVisiable() {
+      this.songReady ? "" : "disable";
     },
-  ...mapMutations({
-      setFullScreen:'SET_FULLSCREEN'
+    cdCls() {
+      return this.playing ? "play" : "pause";
+    },
+    playIcon() {
+      return this.playing ? "icon-pause" : "icon-play";
+    },
+    miniIcon() {
+      return this.playing ? "icon-pause-mini" : "icon-play-mini";
+    },
+    ...mapGetters([
+      "fullScreen",
+      "playList",
+      "currentSong",
+      "playing",
+      "currentIndex"
+    ])
+  },
+  created() {},
+  methods: {
+    back() {
+      this.setFullScreen(false);
+    },
+    open() {
+      this.setFullScreen(true);
+    },
+    ...mapMutations({
+      setPlaying: "SET_PLAYING_STATE",
+      setFullScreen: "SET_FULLSCREEN",
+      setCurrentIndex: "SET_CURRENTINDEX"
     }),
-    enter(){
-      const {x,y,scale} = this._getPosAndScale()
+    enter(el, done) {
+      const { x, y, scale } = this._getPosAndScale();
       let animation = {
-        0:{
-          transform:`translate3d(${x}px,${y}px,0) scale(${scale})`
+        0: {
+          transform: `translate3d(${x}px,${y}px,0) scale(${scale})`
         },
-        60:{
-          transform:`translate3d(0,0,0) scale(1.1)`
+        60: {
+          transform: `translate3d(0,0,0) scale(1.1)`
         },
-        100:{
-          transform:`translate3d(0,0,0) scale(1)`
+        100: {
+          transform: `translate3d(0,0,0) scale(1)`
         }
+      };
+      animations.registerAnimation({
+        name: "move",
+        animation,
+        presets: {
+          duration: 500, // 持续时间
+          easing: "linear" // 过度效果
+        }
+      });
+      animations.runAnimation(this.$refs.cdWrapper, "move", done);
+    },
+    afterEnter() {
+      animations.unregisterAnimation("move");
+      this.$refs.cdWrapper.style[transform] = "";
+    },
+    leave() {
+      this.$refs.cdWrapper.style.transition = "all 1s";
+      const { x, y, scale } = this._getPosAndScale();
+      this.$refs.cdWrapper.style[
+        transform
+      ] = `translate3d(${x}px,${y}px,0) scale(${scale})`;
+      //  this.$refs.cdWrapper.addEventListener('transitionend', done)
+    },
+    afterLeave() {
+      this.$refs.cdWrapper.style[transform] = "";
+      this.$refs.cdWrapper.style.transition = "";
+    },
+    togglePlaying() {
+      this.setPlaying(!this.playing);
+    },
+    ready() {
+      this.songReady = true;
+    },
+    error() {
+      this.songReady = true;
+    },
+    prev() {
+      if (!this.songReady) {
+        return;
       }
+       //重置播放条
+      this.currentTime = 0;
+      let index = this.currentIndex - 1;
+      if (index === -1) {
+        index = this.playList.length - 1;
+      }
+      this.setCurrentIndex(index);
+      if (!this.playing) {
+        this.togglePlaying();
+      }
+      this.songReady = true;
     },
-    afterEnter(){
-
+    next() {
+      if (!this.songReady) {
+        return;
+      }
+      //重置播放条
+      this.currentTime = 0;
+      let index = this.currentIndex + 1;
+      if (index === this.playList.length) {
+        index = 0;
+      }
+      this.setCurrentIndex(index);
+      if (!this.playing) {
+        this.togglePlaying();
+      }
+      this.songReady = true;
     },
-    leave(){
-
+    updateTime(e) {
+      this.currentTime = e.target.currentTime;
     },
-    afterLeave(){
-
+    ended(){
+      this.next()
     },
-    _getPosAndScale(){
-        const targetWidth = 40
-        const paddingLeft = 40
-        const paddingBottom = 30
-        const paddingTop = 80
-        const width = window.innerWidth*0.8
-        const scale = targetWidth/width
-        const x = -(window.innerWidth/2-paddingLeft)
-        const y =window.innerHeight-paddingTop-width/2-paddingBottom
-        return {
-          x,
-          y,
-          scale
+    showPlaylist() {},
+    format(interval) {
+      // 格式化分秒
+      interval = interval | 0;
+      let minute = (interval / 60) | 0;
+      let second = this._pad(interval % 60);
+      return `${minute}:${second}`;
+    },
+    precentChange(precent){
+        this.currentTime = this.currentSong.duration*precent
+        this.$refs.audio.currentTime = this.currentTime
+        if (!this.playing) {
+          this.togglePlaying();
         }
+    },
+    _pad(num, n = 2) {
+      // 当秒小于10时在前面补0
+      let len = num.toString().length;
+      if (len < n) {
+        num = "0" + num;
+      }
+      return num;
+    },
+    _getPosAndScale() {
+      const targetWidth = 40;
+      const paddingLeft = 40;
+      const paddingBottom = 30;
+      const paddingTop = 80;
+      const width = window.innerWidth * 0.8;
+      const scale = targetWidth / width;
+      const x = -(window.innerWidth / 2 - paddingLeft);
+      const y = window.innerHeight - paddingTop - width / 2 - paddingBottom;
+      return {
+        x,
+        y,
+        scale
+      };
     }
   },
-  components:{
-    Scroll
+  components: {
+    Scroll,
+    ProgressBar
+  },
+  watch: {
+    currentSong(newSong) {
+      this.$nextTick(() => {
+        this.$refs.audio.play();
+      });
+    },
+    playing(newState) {
+      const audio = this.$refs.audio;
+      this.$nextTick(() => {
+        this.playing ? audio.play() : audio.pause();
+      });
+    }
   }
 };
 </script>
