@@ -51,17 +51,17 @@ const progressBtnWidth = 16
         const percent = this.$refs.progress.clientWidth / barWidth
         this.$emit('precentChange', percent)
       },
-      _offset(offsetWidth){
-        this.$refs.progress.style.width = offsetWidth+'px'
-        this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+       _offset(offsetWidth) {
+        this.$refs.progress.style.width = `${offsetWidth}px`
+        this.$refs.progressBtn.style[transform] = `translate3d(${offsetWidth}px,0,0)`        
       }
     },
     watch:{
       precent(newPrecent){
-        if (newPrecent>0 &&!this.touch.initiated) {
+        if (newPrecent>=0 &&!this.touch.initiated) {         
           let progressBarWidth = this.$refs.progressBar.clientWidth;
-          let offsetWidht = `${progressBarWidth *newPrecent}px`
-          this._offset(offsetWidht)
+          let offsetWidth = `${progressBarWidth *newPrecent}`
+          this._offset(offsetWidth)         
         }
       }
     }
