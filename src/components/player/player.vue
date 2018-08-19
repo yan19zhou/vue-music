@@ -19,7 +19,7 @@
         </div>
         <div class="middle">
           <div class="middle-l" >
-            <div class="cd-wrapper">
+            <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" >
                 <img class="image" :src="currentSong.image" >
               </div>
@@ -96,6 +96,8 @@ import { mapGetters } from "vuex";
 import Scroll from 'base/scroll/scroll'
 import {mapMutations} from 'vuex'
 import animations from 'create-keyframe-animation'
+import {prefixStyle} from 'common/js/dom'
+const transform = prefixStyle('transform')
 export default {
   computed: {
     ...mapGetters(["fullScreen", "playList", "currentSong"])
@@ -113,7 +115,7 @@ export default {
   ...mapMutations({
       setFullScreen:'SET_FULLSCREEN'
     }),
-    enter(){
+    enter(el,done){
       const {x,y,scale} = this._getPosAndScale()
       let animation = {
         0:{
@@ -126,15 +128,29 @@ export default {
           transform:`translate3d(0,0,0) scale(1)`
         }
       }
+      animations.registerAnimation({
+        name:"move",
+        animation,
+        presets:{
+          duration:600,
+          easing:'linear'
+        }
+      })
+      animations.runAnimation(this.$refs.cdWrapper,'move',done)
     },
     afterEnter(){
-
+      animations.unregisterAnimation('move')
+      this.$refs.cdWrapper.style.animation=''
     },
-    leave(){
-
+    leave(el,done){
+      this.$refs.cdWrapper.transition=`all 0.4s`
+      const {x,y,scale} = this._getPosAndScale()
+     // this.$refs.cdWrapper.style[transform]=`translate3d(${x}px,${y}px,0) scale(${scale})`
+      this.$refs.cdWrapper.addEventListener('transitioned',done)
     },
     afterLeave(){
-
+      this.$refs.cdWrapper.transition=""
+      this.$refs.cdWrapper.style.transform=""
     },
     _getPosAndScale(){
         const targetWidth = 40
