@@ -1,5 +1,5 @@
 <template>
-  <div class="progress-bar" ref="progressBar">
+  <div class="progress-bar" ref="progressBar" @click="clickProgress">
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
       <div class="progress-btn-wrapper" ref="progressBtn" 
@@ -39,7 +39,7 @@ const progressBtnWidth = 16
         }       
         let deltaX = e.touches[0].pageX - this.touch.startX
         let offsetWidth = Math.min(this.$refs.progressBar.clientWidth,Math.max(0,deltaX+this.touch.left))
-        this._offset(offsetWidth)
+        this._offset(offsetWidth)      
       },
       progressTouchend(e){
         this.touch.initiated = false;
@@ -49,6 +49,12 @@ const progressBtnWidth = 16
         const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
         const percent = this.$refs.progress.clientWidth / barWidth
         this.$emit('precentChange', percent)
+      },
+      clickProgress(e){
+        console.log(e)
+        let offsetWidth = e.offsetX
+        this._offset(offsetWidth)
+        this._triggerPercent()
       },
        _offset(offsetWidth) {
         this.$refs.progress.style.width = `${offsetWidth}px`
