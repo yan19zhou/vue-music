@@ -40,7 +40,6 @@ const progressBtnWidth = 16
         let deltaX = e.touches[0].pageX - this.touch.startX
         let offsetWidth = Math.min(this.$refs.progressBar.clientWidth,Math.max(0,deltaX+this.touch.left))
         this._offset(offsetWidth)
-       
       },
       progressTouchend(e){
         this.touch.initiated = false;
