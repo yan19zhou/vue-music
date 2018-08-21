@@ -80,7 +80,7 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <progress-circle :radius="radius" :precent="precent">
+          <progress-circle :radius="radius" :percent="precent">
              <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
          
@@ -138,7 +138,8 @@ export default {
       "playList",
       "currentSong",
       "playing",
-      "currentIndex"
+      "currentIndex",
+      "mode"
     ])
   },
   created() {},

@@ -31,10 +31,7 @@ export default {
       }
     },
     watch:{
-      percent(newValue){
-          console.log(11111111)
-         console.log(this.dashOffset) 
-      }  
+ 
     } 
 }
 </script>
