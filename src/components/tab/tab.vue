@@ -11,19 +11,30 @@
 <style lang="stylus" scoped>
 @import '~common/stylus/variable.styl';
 
-.tab {
+.tab 
     display: flex;
     justify-content: center;
-}
+    div 
+        margin: 10px
+        width: 60px
+        text-align: center
+        position relative
 
-.tab div {
-    margin: 10px;
-    width: 60px;
-    text-align: center;
-}
+        span::after
+                transform scale(0)
+                width 60px
+                height: 4px
+                position: absolute
+                bottom: -5px
+                left: 0
+                background-color: $color-theme
+                content: ''       
+    .active 
+        color: $color-theme
+        //border-bottom: 3px solid $color-theme
+        span::after
+            transform scale(1)
+            transition ease-in-out .3s
 
-.active {
-    color: $color-theme;
-    border-bottom: 3px solid $color-theme;
-}
+
 </style>

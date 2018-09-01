@@ -80,7 +80,10 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i @click.stop="togglePlaying" :class="miniIcon"></i>
+          <progress-circle :radius="radius" :percent="precent">
+             <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
+          </progress-circle>
+         
           <!-- <progress-circle >
             <i  class="icon-mini" ></i>
           </progress-circle> -->
@@ -104,12 +107,14 @@ import ProgressBar from "base/progress-bar/progress-bar";
 import { mapMutations } from "vuex";
 import animations from "create-keyframe-animation";
 import { prefixStyle } from "common/js/dom";
+import ProgressCircle from "base/progress-circle/progress-circle"
 const transform = prefixStyle("animation");
 export default {
   data() {
     return {
       songReady: false,
-      currentTime: 0
+      currentTime: 0,
+      radius:32
     };
   },
   computed: {
@@ -133,7 +138,8 @@ export default {
       "playList",
       "currentSong",
       "playing",
-      "currentIndex"
+      "currentIndex",
+      "mode"
     ])
   },
   created() {},
@@ -276,7 +282,8 @@ export default {
   },
   components: {
     Scroll,
-    ProgressBar
+    ProgressBar,
+    ProgressCircle
   },
   watch: {
     currentSong(newSong) {
