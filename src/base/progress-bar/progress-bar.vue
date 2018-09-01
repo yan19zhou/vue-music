@@ -1,5 +1,5 @@
 <template>
-  <div class="progress-bar" ref="progressBar">
+  <div class="progress-bar" ref="progressBar" @click="progressClick">
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
       <div class="progress-btn-wrapper" ref="progressBtn" 
@@ -50,6 +50,10 @@ const progressBtnWidth = 16
         const barWidth = this.$refs.progressBar.clientWidth - progressBtnWidth
         const percent = this.$refs.progress.clientWidth / barWidth
         this.$emit('precentChange', percent)
+      },
+      progressClick(e){
+        this._offset(e.offsetX)
+        this._triggerPercent()
       },
        _offset(offsetWidth) {
         this.$refs.progress.style.width = `${offsetWidth}px`
