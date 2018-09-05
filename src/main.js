@@ -5,6 +5,7 @@ import router from './router'
 import fastclick from 'fastclick'
 import lazyload from 'vue-lazyload'
 import store from './store'
+import 'base/global.js'
 Vue.config.productionTip = false
 
 fastclick.attach(document.body)
