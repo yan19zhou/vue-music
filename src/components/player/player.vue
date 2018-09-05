@@ -52,7 +52,7 @@
           </div>
           <div class="operators">
             <div class="icon i-left" >
-              <i class="icon-sequence"></i>
+              <i :class="iconMode" @click="modeChange"></i>
             </div>
             <div class="icon i-left" :class="playVisiable">
               <i @click="prev" class="icon-prev" ></i>
@@ -108,6 +108,8 @@ import { mapMutations } from "vuex";
 import animations from "create-keyframe-animation";
 import { prefixStyle } from "common/js/dom";
 import ProgressCircle from "base/progress-circle/progress-circle"
+import {playMode} from 'common/js/config'
+import {shuffle} from 'common/js/util'
 const transform = prefixStyle("animation");
 export default {
   data() {
@@ -118,6 +120,9 @@ export default {
     };
   },
   computed: {
+    iconMode(){
+     return  this.mode == playMode.sequence ? 'icon-sequence' :this.mode == playMode.loop ? 'icon-loop' :'icon-random'
+    },
     precent() {
       return this.currentTime / this.currentSong.duration;
     },
@@ -139,7 +144,8 @@ export default {
       "currentSong",
       "playing",
       "currentIndex",
-      "mode"
+      "mode",
+      "sequenceList"
     ])
   },
   created() {},
@@ -153,7 +159,9 @@ export default {
     ...mapMutations({
       setPlaying: "SET_PLAYING_STATE",
       setFullScreen: "SET_FULLSCREEN",
-      setCurrentIndex: "SET_CURRENTINDEX"
+      setCurrentIndex: "SET_CURRENTINDEX",
+      setMode:"SET_MODE",
+      setPlayList:"SET_PLAYLIST"
     }),
     enter(el, done) {
       const { x, y, scale } = this._getPosAndScale();
@@ -256,6 +264,25 @@ export default {
           this.togglePlaying();
         }
     },
+    modeChange(){
+      let mode = (this.mode+1)%3
+      this.setMode(mode)
+      let list =[]
+      if (mode == playMode.random) {
+        list = shuffle(this.sequenceList)
+      }else{
+        list = this.sequenceList
+      }
+      
+      this.resetCurrentIndex(list)
+      this.setPlayList(list)     
+    },
+    resetCurrentIndex(list){
+      let index = list.findIndex((item)=>{
+        return item.id == this.currentSong.id
+      })
+      this.setCurrentIndex(index)
+    },
     _pad(num, n = 2) {
       // 当秒小于10时在前面补0
       let len = num.toString().length;
@@ -286,7 +313,10 @@ export default {
     ProgressCircle
   },
   watch: {
-    currentSong(newSong) {
+    currentSong(newSong,oldSong) {
+      if(newSong.id===oldSong.id){
+        return ;
+      }
       this.$nextTick(() => {
         this.$refs.audio.play();
       });
