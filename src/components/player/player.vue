@@ -17,7 +17,7 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
+        <div class="middle" @touchstart.prevent="middleTouchStart" @touchmove.prevent="middleTouchMove" @touchend.prevent="middleTouchEnd">
           <div class="middle-l" >
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" :class="cdCls">
@@ -28,11 +28,12 @@
               <div class="playing-lyric"></div>
             </div>
           </div>
-          <scroll class="middle-r" >
+          <scroll class="middle-r" ref="lyric">
             <div class="lyric-wrapper">
               <div >
                 <p ref="lyricLine"
                    class="text">
+                    <light></light>
                    </p>
               </div>
             </div>
@@ -40,7 +41,7 @@
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
-            <span class="dot" ></span>
+            <span class="dot" :class="{active:currentShow=='cd'}" ></span>
             <span class="dot" ></span>
           </div>
           <div class="progress-wrapper">
@@ -83,10 +84,6 @@
           <progress-circle :radius="radius" :percent="precent">
              <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
-         
-          <!-- <progress-circle >
-            <i  class="icon-mini" ></i>
-          </progress-circle> -->
         </div>
         <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
@@ -110,13 +107,16 @@ import { prefixStyle } from "common/js/dom";
 import ProgressCircle from "base/progress-circle/progress-circle"
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
-const transform = prefixStyle("animation");
+import  Light from "./light"
+const transform = prefixStyle("transform");
+
 export default {
   data() {
     return {
       songReady: false,
       currentTime: 0,
-      radius:32
+      radius:32,
+      currentShow:'cd'
     };
   },
   computed: {
@@ -148,7 +148,9 @@ export default {
       "sequenceList"
     ])
   },
-  created() {},
+  created() {
+  this.touch = {};
+  },
   methods: {
     back() {
       this.setFullScreen(false);
@@ -283,6 +285,36 @@ export default {
       })
       this.setCurrentIndex(index)
     },
+    middleTouchStart(e){
+      
+       let touchStart = e.touches[0]
+       this.touch.startX = touchStart.pageX
+       this.touch.startY = touchStart.pageY
+      // console.log(this.this.touch.startX)
+    },
+    middleTouchMove(e){
+     
+       let touchMove = e.touches[0]
+       let moveX = touchMove.pageX
+       let moveY = touchMove.pageY
+       let precent = Math.abs((this.touch.startX-moveX)/window.screen.width)
+      // console.log(moveX)
+       if(this.touch.startX>moveX){       
+         this.$refs.lyric.$el.style[transform] = `translate3d(${moveX-this.touch.startX}px,0,0)`
+         console.log(window.screen.width)
+         if(precent>=0.5){
+          this.$refs.lyric.$el.style[transform] = `translate3d(${-window.screen.width}px,0,0)` 
+          return ;
+         }
+         
+       }else{
+
+       }
+       
+    },
+    middleTouchEnd(e){
+
+    },
     _pad(num, n = 2) {
       // 当秒小于10时在前面补0
       let len = num.toString().length;
@@ -310,7 +342,8 @@ export default {
   components: {
     Scroll,
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Light
   },
   watch: {
     currentSong(newSong,oldSong) {
