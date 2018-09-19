@@ -28,9 +28,11 @@ import songList from 'base/song-list/song-list'
 import scroll from 'base/scroll/scroll'
 import {prefixStyle} from 'common/js/dom'
 import {mapActions} from 'vuex'
+import {Mixin} from 'common/js/mixin'
 const SCROLL_HEIGHT = 40
 const transform = prefixStyle('transform')
 export default {
+    mixins:[Mixin],
     props:{
       songs:{
         type:Array,
@@ -66,6 +68,11 @@ export default {
       this.$refs.list.$el.style.top = this.bgImageHeight+'px'
     },  
     methods:{
+      handlePlayList(playList){
+        const bottom = playList.length>0 ? '60px' : ''
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
       back(){
         this.$router.back()
       },
@@ -90,21 +97,25 @@ export default {
         let zIndex =0
         let translateY = Math.max( this.minHeight, newY)
         let scale = 1
-       
+        
           this.$refs.layer.style[transform] = `translate3d(0,${translateY}px,0)`
           let percent = Math.abs(newY/this.minHeight)
           if (newY>0) {
             scale = scale+percent
-            zIndex=2
+            zIndex=2 
+                 
           }
          if (newY < this.minHeight) {
            this.$refs.bgImage.style.paddingTop=0;
-           this.$refs.bgImage.style.height = `${SCROLL_HEIGHT}px`
+           this.$refs.bgImage.style.height = `${SCROLL_HEIGHT}px`          
            zIndex = 2
+            this.$refs.playBtn.style.display='none'
          }else{
            this.$refs.bgImage.style.paddingTop='70%';
            this.$refs.bgImage.style.height = 0
+          this.$refs.playBtn.style.display='block'   
          }
+        
         this.$refs.bgImage.style['zIndex']=zIndex
         this.$refs.bgImage.style[transform] = `scale(${scale})`
       }
