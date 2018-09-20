@@ -1,6 +1,6 @@
 <template>
     <div class="rank" v-if="songList.length" >
-        <scroll :data="songList" class="songList" >
+        
             <div class="top">
                 <div class="top-title">
                     <div class="top-img"><img :src="topinfo.pic" alt=""></div>
@@ -25,15 +25,17 @@
                 <div ref="playBtn" v-show="!playType" class="palyStart" @click="palyStart">
                     <span class="text">播放全部</span>
                 </div>
-            <ul class="songs">
-                    <li v-for="(song,index) in songList" class="song-list">
-                        <p class="song-name"><span :class="{'theme':index<3}">{{index+1}} </span> {{song.data.songname}}</p>
-                        <p class="song-singer"><span v-for="item in song.data.singer">{{item.name}}/</span></p>
-                    </li>
-                </ul>
-            
-            </div>                    
-        </scroll>
+                <div class="l-wrapper">
+                    <scroll :data="songList" class="songWrapper" >
+                        <ul class="songs">
+                            <li v-for="(song,index) in songList" class="song-list">
+                                <p class="song-name"><span :class="{'theme':index<3}">{{index+1}} </span> {{song.data.songname}}</p>
+                                <p class="song-singer"><span v-for="item in song.data.singer">{{item.name}}/</span></p>
+                            </li>
+                        </ul>
+                    </scroll>
+                </div>               
+            </div>                           
     </div> 
 
 </template>
@@ -42,6 +44,9 @@ import Scroll from 'base/scroll/scroll'
 import {getTopList} from 'api/rank'
 import {ERR_OK} from 'api/config'
 import ProgressCircle from 'base/progress-circle/progress-circle'
+import {mapMutations} from 'vuex'
+import {mapGetters} from 'vuex'
+
 export default {
     data(){
         return{
@@ -49,13 +54,15 @@ export default {
         topinfo:{},
         radius:32,
         percent:0,
-        playType:false
+        playType:false,
+        playing:false
         }
     },
     computed:{
      miniIcon() {
       return this.playing ? "icon-pause-mini" : "icon-play-mini";
     },
+        ...mapGetters(['playList'])
     },
     components:{
         Scroll,
@@ -63,16 +70,21 @@ export default {
     },
     created(){
         this._getTopList()
-  
+
     },
     methods:{
+        ...mapMutations({
+            setPlayList:'SET_PLAYLIST'
+        }),
+
         palyStart(){
-           
+          // this.setPlayList(this.)
+          console.log(this.playList)
             this.playType = true
              console.log(this.playType)
         },
         togglePlaying(){
-
+            this.playing = !this.playing
         },
         _getTopList(){
            getTopList().then((res)=>{  
@@ -91,10 +103,12 @@ export default {
 
 <style lang="stylus" scoped>
 @import "~common/stylus/variable"
+
     .top-title 
         width 100%
         display flex
         margin-top 20px
+        margin-left 10px
         align-items center
         .top-img
             width 34%
@@ -147,9 +161,21 @@ export default {
     .theme{
         color $color-theme
     }
+    .l-wrapper{
+        position: fixed
+        width: 100%
+        top: 280px
+        bottom: 0
+        .songWrapper{
+            height: 100%
+            overflow: hidden;
+        }
+    }
+    
 .songs{
     background-color #efeaea
     color #000
+    padding-top: 10px;
     .song-list{
         margin 10px
         .song-singer{
