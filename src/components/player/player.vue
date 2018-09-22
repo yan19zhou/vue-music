@@ -25,7 +25,9 @@
               </div>
             </div>
             <div class="playing-lyric-wrapper">
-              <div class="playing-lyric"></div>
+              <div class="playing-lyric">
+                
+              </div>
             </div>
           </div>
           <scroll class="middle-r" >
@@ -33,6 +35,8 @@
               <div >
                 <p ref="lyricLine"
                    class="text">
+                  dalfnafoie
+                rnlafnaskhfas
                    </p>
               </div>
             </div>
@@ -40,8 +44,8 @@
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
-            <span class="dot" ></span>
-            <span class="dot" ></span>
+            <span class="dot" :class="{'active':currentShow=='cd'}"></span>
+            <span class="dot" :class="{'active':currentShow=='lyric'}"></span>
           </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
@@ -116,7 +120,8 @@ export default {
     return {
       songReady: false,
       currentTime: 0,
-      radius:32
+      radius:32,
+      currentShow:'cd'
     };
   },
   computed: {
@@ -247,7 +252,15 @@ export default {
       this.currentTime = e.target.currentTime;
     },
     ended(){
+      if(this.mode == playMode.loop){
+        this.loop()
+      }else{
       this.next()
+      }
+    },
+    loop(){
+      this.$refs.audio.currentTime = 0
+      this.$refs.audio.play()
     },
     showPlaylist() {},
     format(interval) {
@@ -319,6 +332,7 @@ export default {
       }
       this.$nextTick(() => {
         this.$refs.audio.play();
+        this.currentSong.getLyric()
       });
     },
     playing(newState) {

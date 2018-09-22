@@ -11,11 +11,12 @@ export const selectPlay = function({commit,state},{list,index}){
     if(state.mode == playMode.random){
         var randomList = shuffle(list)
         commit('SET_PLAYLIST',randomList)  
+        index = findIndex(randomList,list[index])
     }else{
         commit('SET_PLAYLIST',list)
     }
     commit('SET_PLAYING_STATE',true)
-    commit('SET_FULLSCREEN',true)
+    commit('SET_FULLSCREEN',true)  
     commit('SET_SEQUENCELIST',list)
     commit('SET_CURRENTINDEX',index)
 }

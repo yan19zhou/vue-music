@@ -79,10 +79,11 @@ export default {
         })
       },
       ...mapActions([
-        'selectPlay'
+        'selectPlay',
+        'randomPlay'
       ]),
       random(){
-        
+        this.randomPlay({list:this.songs})
       }
     },
     watch:{
@@ -100,10 +101,12 @@ export default {
          if (newY < this.minHeight) {
            this.$refs.bgImage.style.paddingTop=0;
            this.$refs.bgImage.style.height = `${SCROLL_HEIGHT}px`
+           this.$refs.playBtn.style.display='none'
            zIndex = 2
          }else{
            this.$refs.bgImage.style.paddingTop='70%';
            this.$refs.bgImage.style.height = 0
+           this.$refs.playBtn.style.display='block'
          }
         this.$refs.bgImage.style['zIndex']=zIndex
         this.$refs.bgImage.style[transform] = `scale(${scale})`

@@ -51,8 +51,10 @@ const progressBtnWidth = 16
         this.$emit('precentChange', percent)
       },
       clickProgress(e){
-        
-        let offsetWidth = e.offsetX
+        let rect = this.$refs.progressBar.getBoundingClientRect()
+        let offsetWidth = e.pageX - rect.left
+        console.log(rect.left+"=="+offsetWidth)
+        // let offsetWidth = e.offsetX
         this._offset(offsetWidth)
         this._triggerPercent()
       },
