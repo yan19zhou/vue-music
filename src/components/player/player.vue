@@ -17,11 +17,11 @@
           <h1 class="title" v-html="currentSong.name"></h1>
           <h2 class="subtitle" v-html="currentSong.singer"></h2>
         </div>
-        <div class="middle">
+        <div class="middle" @touchstart.prevent="middleTouchStart" @touchmove.prevent="middleTouchMove" @touchend.prevent="middleTouchEnd">
           <div class="middle-l" >
             <div class="cd-wrapper" ref="cdWrapper">
               <div class="cd" :class="cdCls">
-                <img  class="image"  :src="currentSong.image" >
+                <img  class="image"  :src="currentSong.image" ref="cdImage">
               </div>
             </div>
             <div class="playing-lyric-wrapper">
@@ -30,13 +30,17 @@
               </div>
             </div>
           </div>
-          <scroll class="middle-r" >
+          <scroll class="middle-r" ref="lyric">
             <div class="lyric-wrapper">
               <div >
                 <p ref="lyricLine"
                    class="text">
+<<<<<<< HEAD
                   dalfnafoie
                 rnlafnaskhfas
+=======
+                    <light></light>
+>>>>>>> ada42a5461eb46a67064c88a3c26b0f6322bbbc5
                    </p>
               </div>
             </div>
@@ -44,8 +48,13 @@
         </div>
         <div class="bottom">
           <div class="dot-wrapper">
+<<<<<<< HEAD
             <span class="dot" :class="{'active':currentShow=='cd'}"></span>
             <span class="dot" :class="{'active':currentShow=='lyric'}"></span>
+=======
+            <span class="dot" :class="{active:currentShow=='cd'}" ></span>
+            <span class="dot" :class="{active:currentShow=='lyric'}" ></span>
+>>>>>>> ada42a5461eb46a67064c88a3c26b0f6322bbbc5
           </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
@@ -87,10 +96,6 @@
           <progress-circle :radius="radius" :percent="precent">
              <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
-         
-          <!-- <progress-circle >
-            <i  class="icon-mini" ></i>
-          </progress-circle> -->
         </div>
         <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
@@ -114,7 +119,9 @@ import { prefixStyle } from "common/js/dom";
 import ProgressCircle from "base/progress-circle/progress-circle"
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
-const transform = prefixStyle("animation");
+import  Light from "./light"
+const transform = prefixStyle("transform");
+const transitionDuration = prefixStyle("transitionDuration")
 export default {
   data() {
     return {
@@ -153,7 +160,9 @@ export default {
       "sequenceList"
     ])
   },
-  created() {},
+  created() {
+  this.touch = {};
+  },
   methods: {
     back() {
       this.setFullScreen(false);
@@ -296,6 +305,68 @@ export default {
       })
       this.setCurrentIndex(index)
     },
+    middleTouchStart(e){
+       this.touch.initiated = true
+       // 用来判断是否是一次移动
+       this.touch.moved = false
+       let touchStart = e.touches[0]
+       this.touch.startX = touchStart.pageX
+       this.touch.startY = touchStart.pageY
+      // console.log(this.this.touch.startX)
+    },
+    middleTouchMove(e){
+      if (!this.touch.initiated) {
+          return
+        }
+        const touch = e.touches[0]
+        const deltaX = touch.pageX - this.touch.startX
+        const deltaY = touch.pageY - this.touch.startY
+        this.touch.precent = Math.abs(deltaX/window.screen.width)
+        if(Math.abs(deltaY) > Math.abs(deltaX)){
+          return 
+        }
+        if (!this.touch.moved) {
+          this.touch.moved = true
+        }
+        const left = this.currentShow === 'cd'?0:window.innerWidth
+        const offsetWidth = Math.min(0,Math.max(-window.innerWidth,deltaX+left))
+        this.$refs.lyric.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+        this.$refs.lyric.$el.style[transitionDuration] = 0
+        this.$refs.cdImage.style.opacity = 1-this.touch.precent
+        this.$refs.cdImage.style[transitionDuration] = 0
+    },
+    middleTouchEnd(e){
+        if (!this.touch.moved) {
+          return
+        }
+        let offsetWidth,opacity;
+        if (this.currentShow === 'cd') {
+          if (this.touch.precent>0.1) {
+            opacity = 0
+            offsetWidth = -window.innerWidth
+            this.currentShow = 'lyric'
+          }else{
+            opacity = 1
+            offsetWidth = 0
+          }
+        }else{
+          if(this.touch.precent < 0.9){
+            opacity = 1
+            offsetWidth = 0
+            this.currentShow = 'cd'
+          }else{
+            opacity = 0
+            offsetWidth = -window.innerWidth
+          }
+        }
+       const time = 300
+        this.$refs.lyric.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
+        this.$refs.lyric.$el.style[transitionDuration] = `${time}ms`
+        this.$refs.cdImage.style.opacity = opacity
+        this.$refs.cdImage.style[transitionDuration] = `${time}ms`
+        this.touch.initiated = false
+       
+    },
     _pad(num, n = 2) {
       // 当秒小于10时在前面补0
       let len = num.toString().length;
@@ -323,7 +394,8 @@ export default {
   components: {
     Scroll,
     ProgressBar,
-    ProgressCircle
+    ProgressCircle,
+    Light
   },
   watch: {
     currentSong(newSong,oldSong) {
