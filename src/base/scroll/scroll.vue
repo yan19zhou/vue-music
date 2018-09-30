@@ -30,9 +30,7 @@ export default {
    } ,
    mounted(){
        setTimeout(() => {       
-             this._initScroll()  
-             console.log(this.data)  
-             console.log(this.srcoll)            
+             this._initScroll()               
        }, 20);
    },
    methods:{

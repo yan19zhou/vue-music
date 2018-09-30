@@ -42,6 +42,7 @@
   import {Mixin} from 'common/js/mixin'
   import {ERR_OK} from 'api/config'
   import {mapMutations} from 'vuex'
+  import axios from 'axios'
 
   export default {
     mixins: [Mixin],
