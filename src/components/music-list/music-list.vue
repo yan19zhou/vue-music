@@ -90,10 +90,13 @@ export default {
         })
       },
       ...mapActions([
-        'selectPlay'
+        'selectPlay',
+        'randomPlay'
       ]),
-      random(){
-        
+        random() {
+        this.randomPlay({
+          list: this.songs
+        })
       }
     },
     watch:{
