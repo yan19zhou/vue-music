@@ -1,18 +1,30 @@
 import {commonParams,options} from './config'
 import jsonp from 'common/js/jsonp'
 import axios from 'axios'
-export function getTopList(){
-   const url = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg'
-   var queryParams = Object.assign({},commonParams,{
-    uin: 0,
-    format: 'json',
-    platform: 'h5',
+export function getTopList() {
+    const url = 'https://c.y.qq.com/v8/fcg-bin/fcg_myqq_toplist.fcg'
+  
+    const data = Object.assign({}, commonParams, {
+      uin: 0,
+      needNewCode: 1,
+      platform: 'h5'
+    })
+  
+    return jsonp(url, data, options)
+  }
+
+  export function getSongList(topid){
+
+    const url= 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_toplist_cp.fcg'
+    const data = Object.assign({},{
+    topid,
     needNewCode: 1,
+    uin: 0,
     tpl: 3,
     page: 'detail',
     type: 'top',
-    topid: 4,
-    _: 1537335931090,
-   })
-   return jsonp(url,queryParams,options)
-}
+    platform: 'h5'
+    },commonParams)
+
+    return jsonp(url,data,options)
+  }

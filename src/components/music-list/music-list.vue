@@ -16,7 +16,7 @@
     <div class="bg-layer" ref="layer"></div>
     <scroll @scroll="scroll" :probe-type="probeType" :listen-scroll="listenScroll" :data="songs" class="list" ref="list">
       <div class="song-list-wrapper">
-          <song-list @select="selectItem" :songs="songs">
+          <song-list @select="selectItem" :songs="songs" :rank="rank">
           </song-list>
       </div>    
       <div class="loading-container" v-show="!songs.length"></div>      
@@ -34,6 +34,10 @@ const transform = prefixStyle('transform')
 export default {
     mixins:[Mixin],
     props:{
+      rank:{
+        type:Boolean,
+        default:false
+      },
       songs:{
         type:Array,
         default:[]
@@ -89,8 +93,10 @@ export default {
         'selectPlay',
         'randomPlay'
       ]),
-      random(){
-        this.randomPlay({list:this.songs})
+        random() {
+        this.randomPlay({
+          list: this.songs
+        })
       }
     },
     watch:{
@@ -108,22 +114,14 @@ export default {
           }
          if (newY < this.minHeight) {
            this.$refs.bgImage.style.paddingTop=0;
-<<<<<<< HEAD
            this.$refs.bgImage.style.height = `${SCROLL_HEIGHT}px`
            this.$refs.playBtn.style.display='none'
-=======
-           this.$refs.bgImage.style.height = `${SCROLL_HEIGHT}px`          
->>>>>>> ada42a5461eb46a67064c88a3c26b0f6322bbbc5
            zIndex = 2
             this.$refs.playBtn.style.display='none'
          }else{
            this.$refs.bgImage.style.paddingTop='70%';
            this.$refs.bgImage.style.height = 0
-<<<<<<< HEAD
-           this.$refs.playBtn.style.display='block'
-=======
           this.$refs.playBtn.style.display='block'   
->>>>>>> ada42a5461eb46a67064c88a3c26b0f6322bbbc5
          }
         
         this.$refs.bgImage.style['zIndex']=zIndex
