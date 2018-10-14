@@ -93,5 +93,8 @@ export default new Router({
         }
       ]
     }
-  ]
+    
+  ],
+    linkActiveClass:'active'
+  
 })

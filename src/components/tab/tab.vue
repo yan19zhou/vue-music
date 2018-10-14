@@ -20,7 +20,7 @@
         text-align: center
         position relative
 
-        &span::after
+        span::after
                 transform scale(0)
                 width 60px
                 height: 4px
@@ -32,7 +32,7 @@
     .active 
         color: $color-theme
         //border-bottom: 3px solid $color-theme
-        &span::after
+        span::after
             transform scale(1)
             transition ease-in-out .3s
 

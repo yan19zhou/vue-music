@@ -1,17 +1,5 @@
 <template>
   <div class="recommend" ref="recommend">
-<<<<<<< HEAD
-      <scroll ref="scroll" class="recommend-content" :data="discList">
-        <div >
-        <div  class="slider-wrapper" ref="sliderWrapper">  
-            <slider v-if="recommends.length">                
-                  <div v-for="item in recommends" >
-                    <a :href="item.linkUrl">
-                    <img class="needsclick" @load="imageLoad" :src="item.picUrl" alt="">
-                    </a>
-                  </div>              
-            </slider>
-=======
     <scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
         <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
@@ -22,7 +10,6 @@
               </a>
             </div>
           </slider>
->>>>>>> 50c2110c2e6171a5ea69f8f52b6764a3b2dbc80c
         </div>
         <div class="recommend-list">
           <h1 class="list-title">热门歌单推荐</h1>
