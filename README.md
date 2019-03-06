@@ -1,5 +1,5 @@
 # vue-music
-仿照用来练手的项目
+
 > A Vue.js project
 
 ## Build Setup
