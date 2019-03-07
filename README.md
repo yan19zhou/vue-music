@@ -1,7 +1,9 @@
 # vue-music
 
-> A Vue.js project
+> A app like qq music
 
+by TECH
+vue+vue-router+vuex+axios+dev-server+express
 ## Build Setup
 
 ``` bash
