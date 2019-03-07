@@ -2,7 +2,7 @@
 
 > A app like qq music
 
-by TECH
+by
 vue+vue-router+vuex+axios+dev-server+express
 ## Build Setup
 
